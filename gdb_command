@@ -1,0 +1,72 @@
+define bsave
+    shell rm -f brestore.txt
+    set logging file brestore.txt
+    set logging on
+    info break
+    set logging off
+    # reformat on-the-fly to a valid gdb command file
+    shell perl -n -e 'print "break $1\n" if /^\d+.+?(\S+)$/g' brestore.txt > brestore.gdb
+end 
+
+define brestore
+  source brestore.gdb
+end
+
+#Paramter: address of m_impl
+define showStringPointer
+  x/s *(int *)($arg0+8)
+end
+
+define showUStringPointer
+  x/hs *(int *)($arg0+8)
+end
+
+#Paramter: String
+define showStringContent
+  #echo Reference Count:
+  #p *(int *)($arg0.m_impl.m_ptr)
+  echo Length:
+  p *(int *)((char *)($arg0.m_impl.m_ptr)+4)
+  #echo Flag:
+  set $flag = *(int *)((char *)($arg0.m_impl.m_ptr)+16)
+  #p/x $flag
+end
+
+define showStringVar
+  #showStringContent $arg0
+  
+  #echo String:\n  
+  #if $flag&(1<<6)||$flag==0
+ 	#	echo [ASCII]:
+  x/s *(int *)((char *)($arg0.m_impl.m_ptr)+8)
+  #end
+  
+  #echo [Unicode]:
+  #x/hs *(int *)((char *)($arg0.m_impl.m_ptr)+8)
+  
+	#if $flag&(1<<2)
+	#	print "*This is a identifier."
+	#end
+	
+	#if $flag&(1<<1)
+	#	print "*Masked Buffer Ownership."
+	#end
+end
+
+#Paramter: KURL
+define showKURL
+  showStringVar $arg0.m_string
+end
+
+
+#Print Hierachey of JSDOMWindowShell
+define showDOMWindowShell
+  p $arg0
+  p $arg0->world()
+  p $arg0->window()
+  p $arg0->window()->impl()
+  p $arg0->window()->shell()
+  p $arg0->impl()
+  p $arg0->impl()->frame()
+  p $arg0->impl()->document()
+end
