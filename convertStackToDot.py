@@ -30,7 +30,7 @@ MAX_STYLE_COUNT = len(Styles)
 FirstNodeAttr = ' style="rounded,filled" fillcolor=\"#00bb0050\"'
 HighlightAttr = ' style="rounded,filled" fillcolor=yellow'
 
-blockNum = 0    
+blockNum = 0
 nodeNo = 0
 
 nodeList={}
@@ -110,11 +110,11 @@ def getClassName(text):
 def getNodeName(text,nodeNo,args):
     global willCommit,blockNodeList,newBlock
     global strictCommit,minStackLevel
-    
+
     processText = text
 
     if len(args.ignore)>0 and re.search(args.ignore,text):
-        return '' 
+        return ['',''];
 
     if args.onlyClass:
         processText = getClassName(text)
@@ -124,7 +124,7 @@ def getNodeName(text,nodeNo,args):
     else:
         nodeName = 'Node'+str(nodeNo)
         nodeList[processText]=nodeName
-        
+
         extraAttr = ''
         try:
             if len(args.highlight)>0 and re.search(args.highlight,processText):
@@ -172,8 +172,8 @@ def createNewRelation(nodeName,lastNodeName,blockNum,args):
         blockNodeOrderList[tempKey] = True
 
 
-def outputFunctions(usedCountDict):    
-    f = open("orderedFunctions.txt", 'w')    
+def outputFunctions(usedCountDict):
+    f = open("orderedFunctions.txt", 'w')
     for node in usedCountDict:
         f.write("%s,%d\n"%(node[0],node[1]))
     f.close()
@@ -228,7 +228,7 @@ def convertToDot(file,args):
     global willCommit,outputText,newBlock,blockNum,nodeNo
     global outputText,callingStack,blockBackTrace
 
-    blockBackTrace = ''    
+    blockBackTrace = ''
     lastNode = ['',''] #name and title
 
     willCommit = (len(args.filter)==0) #To specify the initial value according to the filter.
@@ -313,7 +313,7 @@ if __name__=="__main__":
         quit()
 
     args = parser.parse_args()
-    
+
     if args.file is None:
         quit()
 
